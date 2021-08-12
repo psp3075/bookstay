@@ -1,17 +1,38 @@
-import { useState } from "react";
-import DashboardNav from "./DashboardNav";
+import { useState, useEffect } from "react";
+import DashboardNav from "../user/DashboardNav";
 import ConnectNav from "../components/ConnectNav";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { HomeOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import axios from "axios";
+import HCard from "./../components/UIElements/HCard";
 
 const DashboardSeller = () => {
+  const { auth } = useSelector((state) => ({ ...state }));
+  const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { auth } = useSelector((state) => ({
-    ...state,
-  }));
+
+  useEffect(() => {
+    const sellerHotels = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API}/seller-hotels`,
+          {
+            headers: {
+              Authorization: `Bearer ${auth.token}`,
+            },
+          }
+        );
+        console.log(response);
+        setHotels(response.data);
+      } catch (err) {
+        console.log(err);
+        toast.error("failed to fetch your hotels, try again after sometime");
+      }
+    };
+    sellerHotels();
+  }, []);
 
   const handleClick = async () => {
     setLoading(true);
@@ -25,11 +46,11 @@ const DashboardSeller = () => {
           },
         }
       );
-      console.log(response);
-      window.location.href = response.data; // open new window
+      console.log(response); // get login link
+      window.location.href = response.data;
     } catch (err) {
       console.log(err);
-      toast.error("stripe connect failed,try again");
+      toast.error("Stripe connect failed, Try again.");
       setLoading(false);
     }
   };
@@ -46,6 +67,11 @@ const DashboardSeller = () => {
           </Link>
         </div>
       </div>
+      <div className="row">
+        {hotels.map((h) => (
+          <HCard key={h._id} h={h} showViewMoreButton={false} owner={true} />
+        ))}
+      </div>
     </div>
   );
 
@@ -55,9 +81,10 @@ const DashboardSeller = () => {
         <div className="col-md-6 offset-md-3 text-center">
           <div className="p-5 pointer">
             <HomeOutlined className="h1" />
-            <h4>Setup payouts to post Hotels</h4>
+            <h4>Setup payouts to post hotel rooms</h4>
             <p className="lead">
-              Bookstay partners with stripe to transfer earnings to your bank
+              MERN partners with stripe to transfer earnings to your bank
+              account
             </p>
             <button
               disabled={loading}
@@ -69,7 +96,7 @@ const DashboardSeller = () => {
             <p className="text-muted">
               <small>
                 You'll be redirected to Stripe to complete the onboarding
-                process
+                process.
               </small>
             </p>
           </div>
@@ -77,20 +104,24 @@ const DashboardSeller = () => {
       </div>
     </div>
   );
+
   return (
     <>
       <div className="container-fluid bg-secondary p-5">
         <ConnectNav />
       </div>
+
       <div className="container-fluid p-4">
         <DashboardNav />
       </div>
+
       {auth &&
       auth.user &&
       auth.user.stripe_seller &&
       auth.user.stripe_seller.charges_enabled
         ? connected()
         : notConnected()}
+
       {/* <pre>{JSON.stringify(auth, null, 4)}</pre> */}
     </>
   );

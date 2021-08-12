@@ -11,14 +11,11 @@ const Register = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API}/register`,
-        {
-          name,
-          email,
-          password,
-        }
-      );
+      await axios.post(`${process.env.REACT_APP_API}/register`, {
+        name,
+        email,
+        password,
+      });
       // console.log(response);
       toast.success("Register successful,please login");
       history.push("/login");

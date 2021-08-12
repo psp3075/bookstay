@@ -9,6 +9,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import DashboardSeller from "./user/DashboardSeller";
 import NewHotel from "./hotels/NewHotel";
+import StripeCallback from "./stripe/StripeCallback";
 
 function App() {
   const { auth } = useSelector((state) => ({ ...state }));
@@ -40,6 +41,11 @@ function App() {
         {auth && auth.token && (
           <Route exact path="/hotels/new">
             <NewHotel />
+          </Route>
+        )}
+        {auth && auth.token && (
+          <Route exact path="/stripe/callback">
+            <StripeCallback />
           </Route>
         )}
       </Switch>
