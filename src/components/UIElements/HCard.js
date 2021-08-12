@@ -3,7 +3,12 @@ import { useHistory } from "react-router";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
-const HCard = ({ h, owner = false, showViewMoreButton = true }) => {
+const HCard = ({
+  h,
+  hotelDeleteHandler,
+  owner = false,
+  showViewMoreButton = true,
+}) => {
   const history = useHistory();
   const currencyFormatter = (data) => {
     return (data.amount / 1).toLocaleString(data.currency, {
@@ -21,10 +26,6 @@ const HCard = ({ h, owner = false, showViewMoreButton = true }) => {
   };
 
   const showMoreHandler = () => history.push(`/hotel/${h._id}`);
-
-  const hotelDeleteHandler = () => {
-    console.log("deleting", h._id);
-  };
 
   return (
     <div className="card mb-3">
@@ -80,7 +81,7 @@ const HCard = ({ h, owner = false, showViewMoreButton = true }) => {
                     <EditOutlined className="text-warning" />
                   </Link>
                   <DeleteOutlined
-                    onClick={hotelDeleteHandler}
+                    onClick={() => hotelDeleteHandler(h._id)}
                     className="text-danger"
                   />
                 </>

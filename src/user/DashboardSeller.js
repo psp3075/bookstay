@@ -24,7 +24,7 @@ const DashboardSeller = () => {
             },
           }
         );
-        console.log(response);
+        // console.log(response);
         setHotels(response.data);
       } catch (err) {
         console.log(err);
@@ -46,12 +46,31 @@ const DashboardSeller = () => {
           },
         }
       );
-      console.log(response); // get login link
+      // console.log(response); // get login link
       window.location.href = response.data;
     } catch (err) {
       console.log(err);
       toast.error("Stripe connect failed, Try again.");
       setLoading(false);
+    }
+  };
+
+  const hotelDeleteHandler = async (hotelId) => {
+    // console.log(hotelId);
+    if (!window.confirm("Are you sure to delete the hotel?")) return;
+    try {
+      const response = await axios.delete(
+        `${process.env.REACT_APP_API}/delete-hotel/${hotelId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${auth.token}`,
+          },
+        }
+      );
+      console.log(response.data);
+      toast.success("hotel deleted successfully");
+    } catch (err) {
+      toast.error("could not delete hotel");
     }
   };
 
@@ -69,7 +88,13 @@ const DashboardSeller = () => {
       </div>
       <div className="row">
         {hotels.map((h) => (
-          <HCard key={h._id} h={h} showViewMoreButton={false} owner={true} />
+          <HCard
+            key={h._id}
+            h={h}
+            hotelDeleteHandler={hotelDeleteHandler}
+            showViewMoreButton={false}
+            owner={true}
+          />
         ))}
       </div>
     </div>
@@ -121,8 +146,6 @@ const DashboardSeller = () => {
       auth.user.stripe_seller.charges_enabled
         ? connected()
         : notConnected()}
-
-      {/* <pre>{JSON.stringify(auth, null, 4)}</pre> */}
     </>
   );
 };

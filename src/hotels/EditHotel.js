@@ -1,18 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import { DatePicker, Select } from "antd";
-import moment from "moment";
 import axios from "axios";
 import { useSelector } from "react-redux";
-import { toast } from "react-toastify";
-
+import moment from "moment";
 const { Option } = Select;
 
-const NewHotel = () => {
+const EditHotel = () => {
+  const hotelId = useParams().hotelId;
   const { auth } = useSelector((state) => ({ ...state }));
 
-  const [preview, setPreview] = useState(
-    "https://via.placeholder.com/100x100.png?text=PREVIEW"
-  );
   const [values, setValues] = useState({
     title: "",
     content: "",
@@ -23,8 +21,33 @@ const NewHotel = () => {
     to: "",
     bed: "",
   });
-
+  const [preview, setPreview] = useState(
+    "https://via.placeholder.com/100x100.png?text=PREVIEW"
+  );
   const { title, content, location, image, price, from, to, bed } = values;
+
+  useEffect(() => {
+    const editHotelById = async () => {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API}/hotel/${hotelId}`
+      );
+      // console.log("here it is", response.data);
+      // console.log(values);
+      setValues({
+        title: response.data.title,
+        content: response.data.content,
+        location: response.data.location,
+        price: response.data.price,
+        from: response.data.from,
+        to: response.data.to,
+        bed: response.data.bed,
+      });
+      setPreview(
+        `${process.env.REACT_APP_API}/hotel/image/${response.data._id}`
+      );
+    };
+    editHotelById();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,12 +61,9 @@ const NewHotel = () => {
     hotelData.append("from", from);
     hotelData.append("to", to);
     hotelData.append("bed", bed);
-
-    // console.log(...hotelData);
-
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API}/create-hotel`,
+      const response = await axios.put(
+        `${process.env.REACT_APP_API}/update-hotel/${hotelId}`,
         hotelData,
         {
           headers: {
@@ -52,14 +72,14 @@ const NewHotel = () => {
         }
       );
       console.log(response.data);
-      toast.success("New hotel added successfully");
+      toast.success("Hotel updated successfully");
       setTimeout(() => {
         window.location.reload();
       }, 1000);
       // console.log(response.data);
     } catch (err) {
       console.log(err);
-      toast.error("Failed to add new hotel ");
+      toast.error("Failed to add update hotel ");
     }
   };
 
@@ -74,7 +94,7 @@ const NewHotel = () => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
-  const hotelForm = () => (
+  const hotelEditForm = () => (
     <form onSubmit={handleSubmit}>
       <div className="form-group">
         <label className="btn btn-outline-secondary btn-block m-2 text-left">
@@ -124,6 +144,7 @@ const NewHotel = () => {
           className="w-100 m-2"
           size="large"
           placeholder="Number of Beds"
+          value={bed}
         >
           <Option key={1}>{1}</Option>
           <Option key={2}>{2}</Option>
@@ -131,39 +152,48 @@ const NewHotel = () => {
           <Option key={4}>{4}</Option>
         </Select>
       </div>
-      <DatePicker
-        placeholder="From Date"
-        className="form-control m-2"
-        onChange={(date, dateString) =>
-          setValues({ ...values, from: dateString })
-        }
-        disabledDate={(current) =>
-          current && current.valueOf() < moment().subtract(1, "days")
-        }
-      />
-      <DatePicker
-        placeholder="To Date"
-        className="form-control m-2"
-        onChange={(date, dateString) =>
-          setValues({ ...values, to: dateString })
-        }
-        disabledDate={(current) =>
-          current && current.valueOf() < moment().subtract(1, "days")
-        }
-      />
+
+      {from && (
+        <DatePicker
+          defaultValue={moment(from, "YYYY-MM-DD")}
+          placeholder="From Date"
+          className="form-control m-2"
+          onChange={(date, dateString) =>
+            setValues({ ...values, from: dateString })
+          }
+          disabledDate={(current) =>
+            current && current.valueOf() < moment().subtract(1, "days")
+          }
+        />
+      )}
+
+      {to && (
+        <DatePicker
+          defaultValue={moment(from, "YYYY-MM-DD")}
+          placeholder="To Date"
+          className="form-control m-2"
+          onChange={(date, dateString) =>
+            setValues({ ...values, to: dateString })
+          }
+          disabledDate={(current) =>
+            current && current.valueOf() < moment().subtract(1, "days")
+          }
+        />
+      )}
       <button className="btn btn-outline-primary m-2">Save</button>
     </form>
   );
+
   return (
     <>
       <div className="container-fluid bg-secondary p-5 text-center">
-        <h2>Add Hotel</h2>
+        <h2>Edit Hotel</h2>
       </div>
       <div className="container-fluid">
         <div className="row">
           <div className="col-md-10">
             <br />
-            {hotelForm()}
+            {hotelEditForm()}
           </div>
           <div className="col-md-2">
             <img
@@ -179,4 +209,4 @@ const NewHotel = () => {
   );
 };
 
-export default NewHotel;
+export default EditHotel;

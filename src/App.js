@@ -10,6 +10,8 @@ import "react-toastify/dist/ReactToastify.css";
 import DashboardSeller from "./user/DashboardSeller";
 import NewHotel from "./hotels/NewHotel";
 import StripeCallback from "./stripe/StripeCallback";
+import EditHotel from "./hotels/EditHotel";
+import ViewHotel from "./hotels/ViewHotel";
 
 function App() {
   const { auth } = useSelector((state) => ({ ...state }));
@@ -48,6 +50,14 @@ function App() {
             <StripeCallback />
           </Route>
         )}
+        {auth && auth.token && (
+          <Route exact path="/hotel/edit/:hotelId">
+            <EditHotel />
+          </Route>
+        )}
+        <Route exact path="/hotel/:hotelId">
+          <ViewHotel />
+        </Route>
       </Switch>
     </Router>
   );
