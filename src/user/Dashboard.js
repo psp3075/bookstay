@@ -1,9 +1,37 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import DashboardNav from "./DashboardNav";
 import ConnectNav from "../components/ConnectNav";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import { toast } from "react-toastify";
+import BookingsCard from "../components/UIElements/BookingsCard";
 
 const Dashboard = () => {
+  const { auth } = useSelector((state) => ({ ...state }));
+  const [booking, setBooking] = useState([]);
+
+  useEffect(() => {
+    const bookedHotels = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API}/user-hotel-booking`,
+          {
+            headers: {
+              Authorization: `Bearer ${auth.token}`,
+            },
+          }
+        );
+        // console.log(response);
+        setBooking(response.data);
+      } catch (err) {
+        console.log(err);
+        toast.error("failed to fetch your hotels, try again after sometime");
+      }
+    };
+    bookedHotels();
+  }, []);
+
   return (
     <>
       <div className="container-fluid bg-secondary p-5">
@@ -23,6 +51,16 @@ const Dashboard = () => {
             </Link>
           </div>
         </div>
+      </div>
+      <div className="row">
+        {booking?.map((b) => (
+          <BookingsCard
+            key={b._id}
+            hotel={b.hotel}
+            session={b.session}
+            orderedBy={b.orderedBy}
+          />
+        ))}
       </div>
     </>
   );

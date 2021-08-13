@@ -1,13 +1,18 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
+import { useSelector } from "react-redux";
+import { loadStripe } from "@stripe/stripe-js";
 
 const ViewHotel = () => {
   const [hotel, setHotel] = useState({});
   const [image, setImage] = useState();
+  const [loading, setLoading] = useState(false);
 
+  const history = useHistory();
   const hotelId = useParams().hotelId;
+  const { auth } = useSelector((state) => ({ ...state }));
 
   useEffect(() => {
     const editHotelById = async () => {
@@ -36,6 +41,34 @@ const ViewHotel = () => {
     const difference = Math.round(Math.abs((start - end) / day));
     return difference;
   };
+
+  const handleClick = async (e) => {
+    setLoading(true);
+    console.log(hotelId);
+    e.preventDefault();
+    if (!auth) history.push("/login");
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API}/stripe-session-id`,
+        { hotelId: hotelId },
+        {
+          headers: {
+            Authorization: `Bearer ${auth.token}`,
+          },
+        }
+      );
+      console.log(response.data.sessionId);
+      const stripe = await loadStripe(process.env.REACT_APP_STRIPE_KEY);
+      stripe
+        .redirectToCheckout({
+          sessionId: response.data.sessionId,
+        })
+        .then((result) => console.log(result));
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <>
       <div className="container-fluid bg-secondary p-5 text-center">
@@ -50,7 +83,7 @@ const ViewHotel = () => {
           <div className="col-md-6">
             <br />
             <strong>{hotel.content}</strong>
-            <p className="alert alert-info mt-3">Rs {hotel.price}/-</p>
+            <p className="alert alert-info mt-3">$ {hotel.price}</p>
             <p className="card-text">
               <span className="float-right text-primary">
                 Available for : {diffDays(hotel.from, hotel.to)}{" "}
@@ -67,8 +100,16 @@ const ViewHotel = () => {
             </p>
             <i>Posted By {hotel.postedBy && hotel.postedBy.name}</i>
             <br />
-            <button className="btn btn-block btn-lg btn-primary mt-3">
-              Book Now
+            <button
+              onClick={handleClick}
+              className="btn btn-block btn-lg btn-primary mt-3"
+              disabled={loading}
+            >
+              {loading
+                ? "Processing..."
+                : auth && auth.token
+                ? "Book Now"
+                : "Login to Book"}
             </button>
           </div>
         </div>

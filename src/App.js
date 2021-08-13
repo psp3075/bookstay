@@ -9,9 +9,11 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import DashboardSeller from "./user/DashboardSeller";
 import NewHotel from "./hotels/NewHotel";
-import StripeCallback from "./stripe/StripeCallback";
 import EditHotel from "./hotels/EditHotel";
 import ViewHotel from "./hotels/ViewHotel";
+import StripeCallback from "./stripe/StripeCallback";
+import StripeSuccess from "./stripe/StripeSuccess";
+import StripeCancel from "./stripe/StripeCancel";
 
 function App() {
   const { auth } = useSelector((state) => ({ ...state }));
@@ -58,6 +60,16 @@ function App() {
         <Route exact path="/hotel/:hotelId">
           <ViewHotel />
         </Route>
+        {auth && auth.token && (
+          <Route exact path="/stripe/success/:hotelId">
+            <StripeSuccess />
+          </Route>
+        )}
+        {auth && auth.token && (
+          <Route exact path="/stripe/cancel">
+            <StripeCancel />
+          </Route>
+        )}
       </Switch>
     </Router>
   );
