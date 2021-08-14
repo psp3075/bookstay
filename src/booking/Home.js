@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import HCard from "./../components/UIElements/HCard";
+import SearchHotel from "../hotels/SearchHotel";
 
 const Home = () => {
   const [hotels, setHotels] = useState([]);
@@ -17,6 +18,10 @@ const Home = () => {
     <>
       <div className="container-fluid bg-secondary p-5 text-center">
         <h1>Home</h1>
+      </div>
+      <div className="col">
+        <br />
+        <SearchHotel />
       </div>
       <div className="container-fluid">
         <br />

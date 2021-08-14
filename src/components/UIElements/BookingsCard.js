@@ -1,7 +1,10 @@
 import { useHistory } from "react-router";
+import { useState } from "react";
+import OrderModal from "./OrderModal";
 
 const BookingsCard = ({ hotel, session, orderedBy }) => {
-  const history = useHistory();
+  const [showModal, setShowModal] = useState(false);
+
   const currencyFormatter = (data) => {
     return (data.amount / 1).toLocaleString(data.currency, {
       style: "currency",
@@ -17,7 +20,7 @@ const BookingsCard = ({ hotel, session, orderedBy }) => {
     return difference;
   };
 
-  const showMoreHandler = () => history.push(`/hotel/${hotel._id}`);
+  const showModalHandler = () => setShowModal(!showModal);
 
   return (
     <div className="card mb-3">
@@ -63,13 +66,20 @@ const BookingsCard = ({ hotel, session, orderedBy }) => {
             <p className="card-text">
               Available from {new Date(hotel.from).toLocaleDateString()}
             </p>
-
-            {/* <div className="d-flex justify-content-between h4">
-              <button onClick={showMoreHandler} className="btn btn-primary">
-                Show more
+            {showModal && (
+              <OrderModal
+                session={session}
+                orderedBy={orderedBy}
+                showModal={showModal}
+                setShowModal={setShowModal}
+              />
+            )}
+            <div className="d-flex justify-content-between h4">
+              <button onClick={showModalHandler} className="btn btn-primary">
+                More info
               </button>
               )
-            </div> */}
+            </div>
           </div>
         </div>
       </div>

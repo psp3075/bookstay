@@ -14,6 +14,8 @@ import ViewHotel from "./hotels/ViewHotel";
 import StripeCallback from "./stripe/StripeCallback";
 import StripeSuccess from "./stripe/StripeSuccess";
 import StripeCancel from "./stripe/StripeCancel";
+import SearchResults from "./hotels/SearchResults";
+import SearchHotel from "./hotels/SearchHotel";
 
 function App() {
   const { auth } = useSelector((state) => ({ ...state }));
@@ -70,6 +72,9 @@ function App() {
             <StripeCancel />
           </Route>
         )}
+        <Route exact path="/search-result">
+          <SearchResults />
+        </Route>
       </Switch>
     </Router>
   );

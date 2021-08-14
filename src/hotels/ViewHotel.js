@@ -9,6 +9,7 @@ const ViewHotel = () => {
   const [hotel, setHotel] = useState({});
   const [image, setImage] = useState();
   const [loading, setLoading] = useState(false);
+  const [alreadyBooked, setAlreadyBooked] = useState(false);
 
   const history = useHistory();
   const hotelId = useParams().hotelId;
@@ -34,6 +35,24 @@ const ViewHotel = () => {
     editHotelById();
   }, []);
 
+  useEffect(() => {
+    if (auth && auth.token) {
+      const disableBookedHotel = async () => {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API}/is-already-booked/${hotelId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${auth.token}`,
+            },
+          }
+        );
+        console.log(response.data);
+        if (response.data.ok) setAlreadyBooked(true);
+      };
+      disableBookedHotel();
+    }
+  }, []);
+
   const diffDays = (from, to) => {
     const day = 24 * 60 * 60 * 1000;
     const start = new Date(from);
@@ -43,10 +62,13 @@ const ViewHotel = () => {
   };
 
   const handleClick = async (e) => {
-    setLoading(true);
-    console.log(hotelId);
     e.preventDefault();
+    if (!auth || !auth.token) {
+      history.push("/login");
+      return;
+    }
     if (!auth) history.push("/login");
+    setLoading(true);
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_API}/stripe-session-id`,
@@ -103,10 +125,12 @@ const ViewHotel = () => {
             <button
               onClick={handleClick}
               className="btn btn-block btn-lg btn-primary mt-3"
-              disabled={loading}
+              disabled={loading || alreadyBooked}
             >
               {loading
                 ? "Processing..."
+                : alreadyBooked
+                ? "Booked"
                 : auth && auth.token
                 ? "Book Now"
                 : "Login to Book"}
