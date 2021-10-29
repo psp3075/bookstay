@@ -5,18 +5,21 @@ import SearchHotel from "../hotels/SearchHotel";
 
 const Home = () => {
   const [hotels, setHotels] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     const loadHotels = async () => {
       const response = await axios.get(`${process.env.REACT_APP_API}/hotels`);
       setHotels(response.data);
+      setLoading(false);
     };
     loadHotels();
   }, []);
 
   return (
     <>
-      <div className="container-fluid bg-secondary p-5 text-center">
+      <div className="container-fluid bg-info p-4 text-center ">
         <h1>Home</h1>
       </div>
       <div className="col">
@@ -25,9 +28,11 @@ const Home = () => {
       </div>
       <div className="container-fluid">
         <br />
-        {hotels.map((h) => (
-          <HCard key={h._id} h={h} />
-        ))}
+        {loading ? (
+          <h1>Loading ...</h1>
+        ) : (
+          hotels.map((h) => <HCard key={h._id} h={h} />)
+        )}
       </div>
     </>
   );

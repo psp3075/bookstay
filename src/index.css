@@ -1,5 +1,8 @@
+@import url("https://fonts.googleapis.com/css2?family=Lora&display=swap");
+
 * {
   box-sizing: border-box;
+  font-family: "Lora", sans-serif;
 }
 
 .pointer {

@@ -171,7 +171,7 @@ const NewHotel = () => {
               alt="preview_image"
               className="img img-fluid m-2"
             />
-            <pre>{JSON.stringify(values, null, 6)}</pre>
+            {/* <pre>{JSON.stringify(values, null, 6)}</pre> */}
           </div>
         </div>
       </div>

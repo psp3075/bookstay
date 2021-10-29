@@ -17,7 +17,7 @@ const Nav = () => {
   };
 
   return (
-    <div className="nav bg-light d-flex justify-content-between">
+    <div className="nav bg-light d-flex justify-content-around h3">
       <Link className="nav-link" to="/">
         Home
       </Link>
